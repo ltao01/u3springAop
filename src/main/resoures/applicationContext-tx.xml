@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+        http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+         http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd"> <!-- bean definitions here -->
+
+    <!-- 2连接数据库 -->
+    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" >
+        <property name="driverClass" value="com.mysql.jdbc.Driver"/>
+        <!-- 配置Jdbc的Url -->
+        <property name="jdbcUrl" value="jdbc:mysql://localhost:3306/u2test?characterEncoding=utf-8"/>
+        <!-- 配置用户名 -->
+        <property name="user" value="root"/>
+        <!-- 密码 -->
+        <property name="password" value="root"/>
+    </bean>
+    <!-- 3.配置事务管理器 -->
+    <bean id="transactionManager"
+          class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <!-- 事务管理数据库连接池 -->
+        <property name="dataSource" ref="dataSource"></property>
+    </bean>
+    <!-- 4.配置事务模版 -->
+    <bean id="transactionTemplate"
+          class="org.springframework.transaction.support.TransactionTemplate">
+        <!-- 事务模版关联事务管理器 -->
+        <property name="transactionManager" ref="transactionManager"></property>
+    </bean>
+    <!-- dao的bean管理 -->
+    <bean id="dao" class="cn.kgc.tx.DaoImpl">
+        <!-- 目的是管理数据库 -->
+        <property name="dataSource" ref="dataSource"></property>
+    </bean>
+    <!--service实现类的的bean管理 -->
+    <bean id="service" class="cn.kgc.tx.AccountServiceImpl">
+        <property name="dao" ref="dao"></property>
+        <property name="transactionTemplate" ref="transactionTemplate"></property>
+    </bean>
+
+</beans>

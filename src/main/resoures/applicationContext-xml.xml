@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop" xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+    <!--目标类bean注册-->
+   <!-- <bean id="user" class="cn.kgc.aop.User" ></bean>
+    &lt;!&ndash;增强类&ndash;&gt;
+    <bean id="handle" class="cn.kgc.aop.Handle" ></bean>-->
+    <!--aop设置-->
+    <aop:config>
+        <!--设置aop切点  切点可以有多个
+        id表示切点名称唯一标示
+        expression表达设置目标中的方法地址
+        表示切点设置具体方法
+        属性：execution（参数1 参数2 参数3）
+        参数1表示*，固定格式
+        参数2表示一个空格
+        参数3表示定义切点方法的地址，方法（..）这两个点表示参数占位符
+        注意：不管当前方法中是否有参数都必须有这两个点，第一个点表示参数类型，第二个点表示参数名称
+        -->
+        <aop:pointcut id="mycut" expression="execution(* cn.kgc.aop.User.insert(..))"></aop:pointcut>
+        <aop:pointcut id="mycut1" expression="execution(* cn.kgc.aop.User.update(..))"></aop:pointcut>
+        <!--设置aop切面
+        ref映射增强类bean管理id属性值，意思是定义增强类为切面
+        -->
+        <aop:aspect ref="handle">
+            <!--前置增强
+            method表示方法，就是增强类中的方法，属性值就是增强类中的方法名称
+            pointcut-ref表示的是当前增强类的方法所对应的
+            -->
+           <!-- <aop:before method="check" pointcut-ref="mycut"></aop:before>-->
+
+            <!--后置增强-->
+         <!--   <aop:after-returning method="check" pointcut-ref="mycut"></aop:after-returning>
+-->
+            <!--环绕增强-->
+            <!--<aop:around method="arround" pointcut-ref="mycut"></aop:around>-->
+
+            <!--异常增城-->
+            <!--<aop:after-throwing method="login" pointcut-ref="mycut1"></aop:after-throwing>-->
+
+            <!--最终增强-->
+            <aop:after method="check" pointcut-ref="mycut1"></aop:after>
+        </aop:aspect>
+</aop:config>
+</beans>

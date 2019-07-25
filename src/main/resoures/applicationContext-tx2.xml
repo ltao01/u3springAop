@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+        http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+         http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd"> <!-- bean definitions here -->
+
+    <!-- 2连接数据库 -->
+    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+        <property name="driverClass" value="com.mysql.jdbc.Driver"/>
+        <!-- 配置Jdbc的Url -->
+        <property name="jdbcUrl" value="jdbc:mysql://localhost:3306/u2test?characterEncoding=utf-8"/>
+        <!-- 配置用户名 -->
+        <property name="user" value="root"/>
+        <!-- 密码 -->
+        <property name="password" value="root"/>
+    </bean>
+    <!-- 3.配置事务管理器 -->
+    <bean id="transactionManager"
+          class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <!-- 事务管理数据库连接池 -->
+        <property name="dataSource" ref="dataSource"></property>
+    </bean>
+    <!-- 3.配置事务管理器 -->
+    <bean id="transactionManager"
+          class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <!-- 事务管理数据库连接池 -->
+        <property name="dataSource" ref="dataSource"></property>
+    </bean>
+    <!-- 4事务的传播行为 -->
+    <tx:advice id="tx" transaction-manager="transactionManager">
+        <!-- 属性集 -->
+        <tx:attributes>
+            <!--
+                name表示加入事务的方法名称
+                以zhuan*开头的方法都加入的事务中
+                isolation属性表示隔离级别，DEFAULT默认级别，
+                propagation传播行为REQUIRED没有事务创建事务，有事务就加入事务
+                read-only只读提示
+                timeout超时间隔
+            -->
+            <tx:method name="transfe*" isolation="DEFAULT" propagation="REQUIRED"
+                       read-only="false" timeout="5"/>
+        </tx:attributes>
+    </tx:advice>
+    <!-- 哪些方法加入事务中aop切面 ,一般情况下把service中的方法加入事务中-->
+    <aop:config>
+        <aop:pointcut expression="execution(* cn.kgc.tx.AccountServiceImpl.*(..))" id="mycut"/>
+        <aop:advisor advice-ref="tx" pointcut-ref="mycut"/>
+    </aop:config>
+    <!-- dao的bean管理 -->
+    <bean id="dao" class="cn.kgc.tx.DaoImpl">
+        <!-- 目的是管理数据库 -->
+        <property name="dataSource" ref="dataSource"></property>
+    </bean>
+    <!--service实现类的的bean管理 -->
+    <bean id="service" class="cn.kgc.tx.AccountServiceImpl">
+        <property name="dao" ref="dao"></property>
+
+    </bean>
+
+</beans>
